@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MultiCriteraDecision
+namespace MultiCriteriaDecision
 {
     public class Class1
     {
