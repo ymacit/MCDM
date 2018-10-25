@@ -55,7 +55,6 @@ namespace MultiCriteriaDecision.Enum
 
     public enum ItemType : int
     {
-        Model = 0,
         Goal = 1,
         Criteria = 2,
         Alternative = 3,

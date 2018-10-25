@@ -7,7 +7,7 @@ namespace MultiCriteriaDecision.Model
 {
     public interface IRelation
     {
-        NetworkType NetworkType { get; }
+        IDecision Project { get;  }
         IDecisionItem Source { get; set;}
         IDecisionItem Target { get; set;}
     }

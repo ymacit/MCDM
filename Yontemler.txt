@@ -1,0 +1,39 @@
+
+
+Aggregated Indices Randomization Method (AIRM)
+*Analytic hierarchy process (AHP)
+*Analytic network process (ANP)
+Best worst method (BWM)[44][45]
+Characteristic Objects METhod (COMET)[46][47]
+Choosing By Advantages (CBA)
+*COPRAS (COmplex PRoportional ASsesment – Karmaþýk Nisbi Deðerlendirme)
+Data envelopment analysis
+Decision EXpert (DEX)
+Disaggregation – Aggregation Approaches (UTA*, UTAII, UTADIS)
+Rough set (Rough set approach)
+Dominance-based rough set approach (DRSA)
+*ELECTRE (Outranking)
+Evaluation Based on Distance from Average Solution (EDAS)[48]
+Evidential reasoning approach (ER)
+Goal programming (GP)
+Grey relational analysis (GRA)
+Inner product of vectors (IPV)
+Measuring Attractiveness by a categorical Based Evaluation Technique (MACBETH)
+Simple Multi-Attribute Rating Technique (SMART)
+Multi-Attribute Global Inference of Quality (MAGIQ)
+Multi-attribute utility theory (MAUT)
+Multi-attribute value theory (MAVT)
+New Approach to Appraisal (NATA)
+Nonstructural Fuzzy Decision Support System (NSFDSS)
+Potentially All Pairwise RanKings of all possible Alternatives (PAPRIKA)
+PROMETHEE (Outranking)
+Stochastic Multicriteria Acceptability Analysis (SMAA)
+Superiority and inferiority ranking method (SIR method)
+*Technique for the Order of Prioritisation by Similarity to Ideal Solution (TOPSIS)
+Value analysis (VA)
+Value engineering (VE)
+*VIKOR method[49]
+Fuzzy VIKOR method[50]
+Weighted product model (WPM)
+Weighted sum model (WSM)
+Rembrandt method

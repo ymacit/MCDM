@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using MultiCriteriaDecision.Enum;
 
-namespace MultiCriteriaDecision.Model
+namespace MultiCriteriaDecision.Analysis
 {
     public class Network
     {

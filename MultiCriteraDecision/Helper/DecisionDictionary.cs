@@ -4,9 +4,9 @@ using System.Text;
 
 namespace MultiCriteriaDecision.Helper
 {
-    public static class Dictionary
+    public static class DecisionDictionary
     {
-        public static SortedList<int, Single> ConsistencyRatio = null;
+        public static SortedList<int, Single> ConsistencyRatio = ConsistencyRatio_Fill();
 
         private static SortedList<int, Single> ConsistencyRatio_Fill()
         {

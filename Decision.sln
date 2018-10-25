@@ -9,9 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DecisionUnitTest", "Decisio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BD16D31D-3EB7-46D2-AAC1-E21DB135DEF2}"
 	ProjectSection(SolutionItems) = preProject
+		AHP_ANP_Notlar.txt = AHP_ANP_Notlar.txt
 		anp.jpg = anp.jpg
 		Deriving the AHP 1-9 scale from first principles .doc = Deriving the AHP 1-9 scale from first principles .doc
-		Notlar.txt = Notlar.txt
+		Yontemler.txt = Yontemler.txt
 	EndProjectSection
 EndProject
 Global

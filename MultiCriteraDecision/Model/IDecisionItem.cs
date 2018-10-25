@@ -7,9 +7,11 @@ namespace MultiCriteriaDecision.Model
 {
     public interface IDecisionItem
     {
+        Guid ID { get; }
         string Name { get; set; }
+        IDecision ParentProject { get; }
         ItemType ItemType { get; }
-        IDecisionItem Parent { get; }
+        IDecisionItem ParentItem { get; }
         IDecisionItem Add(ItemType type, string name);
         void Remove(IDecisionItem item);
         IReadOnlyList<IDecisionItem> Childs { get; }

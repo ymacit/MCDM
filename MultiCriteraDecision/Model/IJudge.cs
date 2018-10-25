@@ -4,10 +4,9 @@ using System.Text;
 
 namespace MultiCriteriaDecision.Model
 {
-    public class Rating
+    public interface IJudge
     {
-        public string Name { get; set; }
-        public List<Rating> RatedRelations { get;set; }
-
+        string Name { get; set; }
+        Guid ID { get; set; }
     }
 }

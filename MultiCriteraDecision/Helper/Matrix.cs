@@ -85,6 +85,18 @@ namespace MultiCriteriaDecision.Helper
                 }
             }
         }
+        internal void ChangeDimesion(int newRowCount, int newColumnCount)
+        {
+            if (RowCount * ColumnCount == newRowCount * newColumnCount)
+            {
+                L = null;
+                U = null;
+                RowCount = newRowCount;
+                ColumnCount = newColumnCount;
+            }
+            else
+                throw new MException("Total dimension is different");
+        }
 
         public int GetColumnMaxValue(int iColumn, double initialValue)
         {
@@ -169,6 +181,23 @@ namespace MultiCriteriaDecision.Helper
             }
             return tmp_index;
         }
+
+        public double GetMaxEigenvalueByWeight(Matrix wMatrix)
+        {
+            //A*w=λ*w => λ= (A*w)/w, λmax=Avg(λn) 
+            double tmp_ResultValue = 0;
+            Matrix tmp_AwMatrix = new Matrix(wMatrix.RowCount, 1);
+            tmp_AwMatrix = Matrix.Multiply(this, wMatrix);
+
+            for (int i = 0; i < tmp_AwMatrix.RowCount; i++)
+            {
+                tmp_ResultValue += tmp_AwMatrix[i,0]/ wMatrix[i,0];
+            }
+
+            tmp_ResultValue = tmp_ResultValue / tmp_AwMatrix.RowCount;
+            return tmp_ResultValue;
+        }
+
 
         public Boolean IsSquare()
         {
@@ -493,6 +522,16 @@ namespace MultiCriteriaDecision.Helper
                 {
                     C[i, j] = 0;
                     if (xa + j < A.ColumnCount && ya + i < A.RowCount) C[i, j] += A[ya + i, xa + j];
+                }
+        }
+        public static void CopyAtoB(Matrix A, int aRow, int aCol, Matrix B, int bRow, int bCol, int sizeRow, int sizeCol)
+        {
+            for (int i = 0; i < sizeRow; i++)          // RowCount
+                for (int j = 0; j < sizeCol; j++)     // ColumnCount
+                {
+                    //B[i, j] = 0;
+                    //if (aRow + j < A.RowCount && aCol + i < A.ColumnCount)
+                    B[i+bRow, j+bCol] += A[aRow + i, aCol + j];
                 }
         }
 
