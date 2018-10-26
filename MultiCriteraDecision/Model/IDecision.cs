@@ -5,11 +5,10 @@ using MultiCriteriaDecision.Enum;
 
 namespace MultiCriteriaDecision.Model
 {
-    public interface IDecision
+    public interface IDecision :IBase
     {
-        string Name { get; set; }
-        IDecisionItem AddCluster(ItemType type, string name);
         IList<IDecisionItem> Clusters { get; }
+        IDecisionItem AddCluster(ItemType type, string name);
         IComparisonPerspective RootPerspective { get; set; }
         IList<IJudgment> Judgments { get; }
     }

@@ -385,7 +385,7 @@ namespace MultiCriteriaDecision.Solver
             m_AllComparisonItems = new Dictionary<IDecisionItem, List<CompareItem>>();
             ReadChildItems(m_Decision, (IReadOnlyList<IDecisionItem>)m_Decision.Clusters);
         }
-        private  int ReadChildItems(IDecision decision, IReadOnlyList<IDecisionItem> itemList)
+        private  int ReadChildItems(IDecision decision, IReadOnlyList<IDecisionItemBase> itemList)
         {
             int tmp_itemCount = 0;
             if (itemList.Count > 0)

@@ -6,70 +6,30 @@ using MultiCriteriaDecision.Model;
 
 namespace MultiCriteriaDecision.Analysis
 {
-    public class DecisionItem : IDecisionItem
+    public class DecisionItem : DecisionItemBase, IDecisionItem
     {
-        string m_Name = string.Empty;
-        IDecisionItem m_parent = null;
-        IDecision m_project = null;
-        List<IDecisionItem> m_Childs = null;
-        ItemType m_type = ItemType.None;
         List<Relation> m_Relations = null;
-        Guid m_id = Guid.Empty;
 
-        public DecisionItem(IDecision project, ItemType type, string name) : this(type, name)
+        public DecisionItem(IDecision project, ItemType type, string name) : base(type, name)
         {
-            m_project = project;
         }
 
-        private DecisionItem(ItemType type, string name)
+        private DecisionItem(ItemType type, string name) : base(type, name)
         {
-            m_Childs = new List<IDecisionItem>();
-            m_type = type;
-            m_Name = name;
-            m_id= Guid.NewGuid();
         }
-
-        public string Name { get => m_Name; set => m_Name=value; }
-
-        public IDecision ParentProject { get => m_project; }
-
-        public IDecisionItem ParentItem { get => m_parent; }
-
-        public IReadOnlyList<IDecisionItem> Childs { get => m_Childs; }
-
-        public ItemType ItemType { get => m_type; }
 
         public List<Relation> Relations { get => m_Relations; }
 
-        public Guid ID { get => m_id; }
-   
         public IDecisionItem Add(ItemType type, string name)
         {
             DecisionItem tmp_item = new DecisionItem(type, name);
-            tmp_item.m_parent = this;
+            tmp_item.SetParent(this);
             m_Childs.Add(tmp_item);
-            return tmp_item; 
+            return tmp_item;
         }
         public void Remove(IDecisionItem item)
         {
             m_Childs.Remove(item);
-        }
-
-        public override string ToString()
-        {
-            string tmp_result = this.m_type.ToString().PadRight(20) + " | " + m_Name ;
-
-            if (m_Childs.Count > 0)
-            {
-                tmp_result += "\n"+ new string('-', 30) + "\n";
-                foreach (IDecisionItem item in m_Childs)
-                {
-                    tmp_result += item.ToString() + "\n";
-                }
-                if (m_parent != null && m_parent.ItemType != m_type)
-                    tmp_result += new string('-', 30) + "\n";
-            }
-            return tmp_result;
         }
     }
 }

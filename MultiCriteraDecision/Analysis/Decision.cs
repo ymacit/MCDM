@@ -7,21 +7,17 @@ using MultiCriteriaDecision.Helper;
 
 namespace MultiCriteriaDecision.Analysis
 {
-    public class Decision : IDecision
+    public class Decision :ItemBase,  IDecision
     {
         List<IDecisionItem> m_Clusters = null;
-
         IComparisonPerspective m_RootPerspective = null;
         List<IJudgment> m_Judgments = null;
 
-        string m_name = null;
-        public Decision(string name)
+        public Decision(string name) :base(name)
         {
-            m_name = name;
             m_Clusters = new List<IDecisionItem>();
             m_Judgments = new List<IJudgment>();
         }
-        public string Name { get =>m_name; set=>m_name=value; }
 
         public IList<IDecisionItem> Clusters { get=>m_Clusters; }
 
@@ -41,7 +37,7 @@ namespace MultiCriteriaDecision.Analysis
         public override string ToString()
         {
             string tmp_result = new string('-', 30) + "\n";
-            tmp_result += this.GetType().Name.PadRight(20) + " | " + m_name +"\n";
+            tmp_result += this.GetType().Name.PadRight(20) + " | " + base.Name +"\n";
 
             foreach (IDecisionItem item in m_Clusters)
             {

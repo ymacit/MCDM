@@ -64,9 +64,9 @@ namespace DecisionUnitTest
             IRelation tmp_Relation_Cr56 = new Relation( tmp_project ) { Source = tmp_CriteriaCollegePrep, Target = tmp_CriteriaMusicClasses };
             ((List<IRelation>)tmp_connectorItem_c0.Relations).AddRange(new List<IRelation>() { tmp_Relation_Cr12, tmp_Relation_Cr13, tmp_Relation_Cr14, tmp_Relation_Cr15, tmp_Relation_Cr16, tmp_Relation_Cr23, tmp_Relation_Cr24, tmp_Relation_Cr25, tmp_Relation_Cr26, tmp_Relation_Cr34, tmp_Relation_Cr35, tmp_Relation_Cr36, tmp_Relation_Cr45, tmp_Relation_Cr46, tmp_Relation_Cr56});
             tmp_project.RootPerspective=tmp_connectorItem_c0;
-            
+
             //Judgment definition
-            IJudge tmp_judge1 = new Judge() { Name = "Name1" };
+            IJudge tmp_judge1 = new Judge("Name1");
             IJudgment tmp_Judgment1 = new Judgment(tmp_judge1, tmp_project) { ComparisonDate = System.DateTime.Now };
             tmp_project.Judgments.Add(tmp_Judgment1);
 
@@ -207,7 +207,7 @@ namespace DecisionUnitTest
             tmp_project.RootPerspective = tmp_connectorItem_c0;
 
             //Judgment definition
-            IJudge tmp_judge1 = new Judge() { Name = "Name1" };
+            IJudge tmp_judge1 = new Judge("Name1");
             IJudgment tmp_Judgment1 = new Judgment(tmp_judge1, tmp_project) { ComparisonDate = System.DateTime.Now };
             tmp_project.Judgments.Add(tmp_Judgment1);
 
@@ -330,10 +330,10 @@ namespace DecisionUnitTest
             IRelation tmp_Relation_Cr24 = new Relation(tmp_project) { Source = tmp_Criteria_Safety, Target = tmp_Criteria_Capacity };
             IRelation tmp_Relation_Cr34 = new Relation(tmp_project) { Source = tmp_Criteria_Style, Target = tmp_Criteria_Capacity };
             ((List<IRelation>)tmp_CriteriaPerpective.Relations).AddRange(new List<IRelation>() { tmp_Relation_Cr12, tmp_Relation_Cr13, tmp_Relation_Cr14, tmp_Relation_Cr23, tmp_Relation_Cr24, tmp_Relation_Cr34 });
-            tmp_project.RootPerspective = tmp_CriteriaPerpective;            
+            tmp_project.RootPerspective = tmp_CriteriaPerpective;
 
             //Judgment definition
-            IJudge tmp_judge1 = new Judge() { Name = "Name1" };
+            IJudge tmp_judge1 = new Judge("Name1");
             IJudgment tmp_Judgment1 = new Judgment(tmp_judge1, tmp_project) { ComparisonDate = System.DateTime.Now };
             tmp_project.Judgments.Add(tmp_Judgment1);
 

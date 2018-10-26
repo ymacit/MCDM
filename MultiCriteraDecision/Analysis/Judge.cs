@@ -8,14 +8,11 @@ using MultiCriteriaDecision.Helper;
 
 namespace MultiCriteriaDecision.Analysis
 {
-    public class Judge :IJudge
+    public class Judge :ItemBase, IJudge
     {
-        public Judge()
+        public Judge(string name):base( name)
         {
-            ID = Guid.NewGuid();
         }
-        public string Name { get; set; }
-        public Guid ID { get; set; }
         public List<Judgment> Judgments { get; set; }
     }
 }
