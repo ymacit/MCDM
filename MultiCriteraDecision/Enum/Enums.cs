@@ -57,7 +57,9 @@ namespace MultiCriteriaDecision.Enum
     {
         Goal = 1,
         Criteria = 2,
-        Alternative = 3,
+        SubCriteria = 3,
+        //TertiaryCriteria = 4,
+        Alternative = 5,
         None=9
 
     }

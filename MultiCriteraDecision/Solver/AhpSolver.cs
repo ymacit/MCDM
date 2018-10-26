@@ -12,15 +12,14 @@ namespace MultiCriteriaDecision.Solver
     public class AhpSolver
     {
         protected IDecision m_Decision = null;
-        protected Matrix m_UnweightedMatrix = null;
         protected Matrix m_WeightedMatrix = null;
         protected Matrix m_ResultMatrix = null;
         Dictionary<IDecisionItem, List<CompareItem>> m_AllComparisonItems = null;
         List<CompareItem> m_FlatPairWiseComparison = null;
         Dictionary<IComparisonPerspective, PairwiseMatrixSet> m_Perspectives = null;
-        Dictionary<string, IDecisionItem> m_DecisionItemDictionary = null;
         List<IDecisionItem> m_MatrixRows = null;
         List<IDecisionItem> m_MatrixColumns = null;
+        private const int m_MaxStringLengt = 15;
         public AhpSolver(IDecision decision)
         {
             m_Decision = decision;
@@ -31,20 +30,25 @@ namespace MultiCriteriaDecision.Solver
             FillFlatList();
             FlatComparisons();
             GeneratePairwiseMatrix();
-            GenerateUnweightedMatrix();
+            PrintTree(m_Decision.RootPerspective, "", 1, true);
+            //GenerateUnweightedMatrix();
             GenerateWeightedMatrix();
+            PrintTree(m_Decision.RootPerspective, "", 1, true);
+            PrintMatrixWithName(m_WeightedMatrix, "Weighted with Name");
+            PrintMatrixWithName(m_ResultMatrix, "Result with Name");
             return m_ResultMatrix;
         }
 
         internal void GenerateWeightedMatrix()
         {
-            PropagatePerpectiveWeigt(m_Decision.RootPerspective);
-            PropagateMatrixWeigt();
-            PrintMatrix(m_ResultMatrix, "WeightedW");
+            //PropagatePerpectiveWeigt_2(m_Decision.RootPerspective);
+            PropagatePerpectiveWeigt(m_Decision.RootPerspective, null);
+            //PropagateMatrixWeigt();
+            GenerateJoinedMatrix();
             GenerateResultMatrix();
+            PrintMatrix(m_WeightedMatrix, "WeightedW");
             PrintMatrix(m_ResultMatrix, "Result");
         }
-
         private void GenerateResultMatrix()
         {
             m_ResultMatrix = new Matrix(m_WeightedMatrix.RowCount, 1);
@@ -61,80 +65,42 @@ namespace MultiCriteriaDecision.Solver
                  m_ResultMatrix[i, 0] = Math.Round(m_ResultMatrix[i, 0],5);
             }
         }
-
-        private void PropagateMatrixWeigt()
+        private void PropagatePerpectiveWeigt(IComparisonPerspective perspective, PairwiseMatrixSet parentSet)
         {
-            //clone unweighted matrix
-            m_WeightedMatrix = m_UnweightedMatrix.Duplicate();
+            PairwiseMatrixSet tmp_CurrentMatrixSet = null;
+            int tmp_vector = -1;
 
-            List<IComparisonPerspective> tmp_LastNodes = m_Perspectives.Keys.ToList();
-            tmp_LastNodes = tmp_LastNodes.Where(node => node.SubPerspectives.Count == 0).ToList();
-            PairwiseMatrixSet tmp_ParentSet = null;
-            int tmp_SourceVector = -1;
-            int tmp_TargetVector = -1;
-            double tmp_Value = 0;
-            foreach (IComparisonPerspective perspective in tmp_LastNodes)
+            tmp_CurrentMatrixSet = m_Perspectives[perspective];
+            if (tmp_CurrentMatrixSet == null)
+                throw new Exception("Comparison Matrix set is not found " + perspective.Pivot.Name);
+
+            if (parentSet != null)
             {
-                tmp_ParentSet = m_Perspectives[perspective.Parent];
-                if(tmp_ParentSet!=null)
+                tmp_vector = parentSet.VectorList[perspective.Pivot];
+                if (tmp_vector != -1)
                 {
-                    tmp_SourceVector = tmp_ParentSet.VectorList[perspective.Pivot];
-                    tmp_TargetVector = m_MatrixColumns.IndexOf(perspective.Pivot);
-
-                    if (tmp_SourceVector != -1 && tmp_TargetVector != -1)
+                    for (int i = 0; i < tmp_CurrentMatrixSet.WeightMatrix.RowCount; i++)
                     {
-                        tmp_Value = tmp_ParentSet.WeightMatrix[tmp_SourceVector, 0];
-                        for (int i = 0; i < m_WeightedMatrix.RowCount; i++)
-                        {
-                            m_WeightedMatrix[i, tmp_TargetVector] *= tmp_Value;
-                        }
+                        //Weight by multiply parent weight Value
+                        tmp_CurrentMatrixSet.WeightMatrix[i, 0] = tmp_CurrentMatrixSet.WeightMatrix[i, 0] * parentSet.WeightMatrix[tmp_vector, 0];
                     }
                 }
+                else
+                    throw new Exception("Vector index is not found for " + perspective.Pivot.Name);
             }
-        }
-        private void PropagatePerpectiveWeigt(IComparisonPerspective perspective )
-        {
-            PairwiseMatrixSet tmp_MatrixSet = null;
-            PairwiseMatrixSet tmp_SubMatrixSet = null;
-            int tmp_vector = -1;
-            if (perspective.SubPerspectives.Count>0)
-            {
-                tmp_MatrixSet= m_Perspectives[perspective];
-                if (tmp_MatrixSet == null || tmp_MatrixSet.WeightMatrix.RowCount!= perspective.SubPerspectives.Count)
-                    throw new Exception("Comparison Matrix set is not found or different column count for " + perspective.Pivot.Name);
 
-                //clone and change row<->column position for weight matrix;
-                //Matrix tmp_WeightMatrix = tmp_MatrixSet.WeightMatrix.Duplicate();
-                //tmp_WeightMatrix.ChangeDimesion(tmp_WeightMatrix.ColumnCount, tmp_WeightMatrix.RowCount);
-                System.Diagnostics.Debug.WriteLine("With Child " + perspective.Pivot.Name);
-                //Apply child 
+            if (perspective.SubPerspectives.Count > 0)
+            {
                 foreach (IComparisonPerspective subPerspective in perspective.SubPerspectives)
                 {
-                    tmp_vector = tmp_MatrixSet.VectorList[subPerspective.Pivot];
-                    if (tmp_vector != -1)
-                    {
-                        tmp_SubMatrixSet = m_Perspectives[subPerspective];
-                        for (int i = 0; i < tmp_SubMatrixSet.WeightMatrix.RowCount; i++)
-                        {
-                            //Weight by multiply parent weight Value
-                            tmp_SubMatrixSet.WeightMatrix[i, 0] = tmp_SubMatrixSet.WeightMatrix[i, 0] * tmp_MatrixSet.WeightMatrix[tmp_vector, 0];
-                        }                        
-                        //
-                        PropagatePerpectiveWeigt(subPerspective);
-                    }
-                    else
-                        throw new Exception("Vector index is not found for " + subPerspective.Pivot.Name + " in " + perspective.Pivot.Name);
+                    PropagatePerpectiveWeigt(subPerspective, tmp_CurrentMatrixSet);
                 }
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("No   Child " + perspective.Pivot.Name);
             }
         }
 
-        internal void GenerateUnweightedMatrix()
+        internal void GenerateJoinedMatrix()
         {
-            m_UnweightedMatrix = new Matrix(m_MatrixRows.Count, m_MatrixColumns.Count);
+            m_WeightedMatrix = new Matrix(m_MatrixRows.Count, m_MatrixColumns.Count);
             m_ResultMatrix = new Matrix(m_MatrixRows.Count, 1);
             //int tmp_rowIndex = -1;
             int tmp_colIndex = -1;
@@ -146,10 +112,10 @@ namespace MultiCriteriaDecision.Solver
                 if (tmp_colIndex > -1)
                 {
                     tmp_set = pairItem.Value;
-                    Matrix.CopyAtoB(tmp_set.WeightMatrix, 0, 0, m_UnweightedMatrix, 0, tmp_colIndex, tmp_set.WeightMatrix.RowCount, tmp_set.WeightMatrix.ColumnCount);
+                    Matrix.CopyAtoB(tmp_set.WeightMatrix, 0, 0, m_WeightedMatrix, 0, tmp_colIndex, tmp_set.WeightMatrix.RowCount, tmp_set.WeightMatrix.ColumnCount);
                 }
             }
-            PrintMatrix(m_UnweightedMatrix, "Unweighted");
+            PrintMatrix(m_WeightedMatrix, "Weighted");
         }
 
         internal void FlatComparisons()
@@ -176,22 +142,6 @@ namespace MultiCriteriaDecision.Solver
                     m_FlatPairWiseComparison.Add(compareItem);
                 }
             }
-        }
-
-        internal void FlatComparisons2()
-        {
-            m_FlatPairWiseComparison = new List<CompareItem>();
-
-            foreach (IJudgment judgment in m_Decision.Judgments)
-            {
-                foreach (IComparison comparison in judgment.Comparisons)
-                {
-                    foreach (IPairwiseComparison pairwise in comparison.Pairwises)
-                    {
-                        m_FlatPairWiseComparison.Add(new CompareItem() { ComparePivot = comparison.Perspective.Pivot,  CompareJudge = judgment.Judge, CompareSource = pairwise.Relation.Source, CompareTarget = pairwise.Relation.Target, Ratio = pairwise.Ratio });
-                    }
-                }
-            }            
         }
 
         internal void GeneratePairwiseMatrix()
@@ -266,7 +216,7 @@ namespace MultiCriteriaDecision.Solver
             tmp_RowWorkerMatrix = GetWeightMatrix(tmp_RawMatrix);
             PrintMatrix(tmp_RowWorkerMatrix, connectorItem.Pivot.Name + " Weight");
             double tmp_ConsistencyRatio = Consistency.Check(tmp_RawMatrix, tmp_RowWorkerMatrix);
-            PairwiseMatrixSet tmp_PairwiseMatrix = new PairwiseMatrixSet() { ConsistencyRatio = tmp_ConsistencyRatio, RawMatrix = tmp_RawMatrix, WeightMatrix = tmp_RowWorkerMatrix, VectorList= tmp_VectorList, LastProcessedPerspective =connectorItem };
+            PairwiseMatrixSet tmp_PairwiseMatrix = new PairwiseMatrixSet() { ConsistencyRatio = tmp_ConsistencyRatio, RawMatrix = tmp_RawMatrix, WeightMatrix = tmp_RowWorkerMatrix, VectorList= tmp_VectorList };
             return tmp_PairwiseMatrix;
         }
 
@@ -323,33 +273,101 @@ namespace MultiCriteriaDecision.Solver
             }
             return tmp_RowWorkerMatrix;
         }
+
+        public void PrintTree(IComparisonPerspective perspective, string indent, double rate, bool last)
+        {
+            System.Diagnostics.Debug.Write(indent);
+            if (last)
+            {
+                System.Diagnostics.Debug.Write("\\-");
+                indent += "  ";
+            }
+            else
+            {
+                System.Diagnostics.Debug.Write("|-");
+                indent += "| ";
+            }
+            System.Diagnostics.Debug.WriteLine(perspective.Pivot.Name + " : " + rate.ToString("F5"));
+
+            PairwiseMatrixSet tmp_matrixSet = m_Perspectives[perspective];
+            if (perspective.SubPerspectives.Count > 0)
+            {
+                int tmp_childCounter = 0;
+                foreach (IComparisonPerspective item in perspective.SubPerspectives)
+                {
+                    int tmp_index = tmp_matrixSet.VectorList[item.Pivot];
+                    double tmp_value = tmp_matrixSet.WeightMatrix[tmp_index, 0];
+                    tmp_childCounter++;
+                    PrintTree(item, indent, tmp_value, perspective.SubPerspectives.Count==tmp_childCounter);
+                }
+            }
+            else
+            {
+                foreach (KeyValuePair<IDecisionItem, int> pair in tmp_matrixSet.VectorList)
+                {
+                    System.Diagnostics.Debug.WriteLine(indent + "+-" + pair.Key.Name + " : " + tmp_matrixSet.WeightMatrix[pair.Value, 0].ToString("F5"));
+                }
+            }
+        }
+
         private void PrintMatrix(Matrix matrix, string message )
         {
+            //Dictionary<int, IDecisionItem> tmp_dictionary=dictionary.ToDictionary(pair => pair.Value, pair => pair.Key);
             //print values
             System.Diagnostics.Debug.WriteLine("******* " + message +  " Matrix Values**********");
-            System.Diagnostics.Debug.Write(0.ToString().PadLeft(7) + "\t");
+            System.Diagnostics.Debug.Write("".PadLeft(10) + "\t");
             for (int j = 0; j < matrix.ColumnCount; j++)
             {
-                System.Diagnostics.Debug.Write(j.ToString().PadLeft(7) + "\t");
+                System.Diagnostics.Debug.Write(j.ToString().PadLeft(10) + "\t");
             }
             System.Diagnostics.Debug.WriteLine("");
             for (int i = 0; i < matrix.RowCount; i++)
             {
-                System.Diagnostics.Debug.Write(i.ToString().PadLeft(7) + "\t");
+                System.Diagnostics.Debug.Write(i.ToString().PadLeft(10) + "\t");
                 for (int j = 0; j < matrix.ColumnCount; j++)
                 {
-                    System.Diagnostics.Debug.Write(matrix[i, j].ToString("F5").PadLeft(7) + "\t");
+                    System.Diagnostics.Debug.Write(matrix[i, j].ToString("F5").PadLeft(10) + "\t");
                 }
                 System.Diagnostics.Debug.WriteLine("");
             }
-
         }
+        private void PrintMatrixWithName(Matrix matrix, string message)
+        {
+            //Dictionary<int, IDecisionItem> tmp_dictionary=dictionary.ToDictionary(pair => pair.Value, pair => pair.Key);
+            //print values
+            System.Diagnostics.Debug.WriteLine("******* " + message + " Matrix Values**********");
+            System.Diagnostics.Debug.Write("".ToString().PadLeft(m_MaxStringLengt) + "\t");
+            for (int j = 0; j < matrix.ColumnCount; j++)
+            {
+                System.Diagnostics.Debug.Write(GetNameStrictLengt(m_MatrixColumns[j].Name).PadLeft(m_MaxStringLengt) + "\t");
+            }
+            System.Diagnostics.Debug.WriteLine("");
+            for (int i = 0; i < matrix.RowCount; i++)
+            {
+
+                System.Diagnostics.Debug.Write(GetNameStrictLengt(m_MatrixRows[i].Name).PadLeft(m_MaxStringLengt) + "\t");
+                for (int j = 0; j < matrix.ColumnCount; j++)
+                {
+                    System.Diagnostics.Debug.Write(matrix[i, j].ToString("F5").PadLeft(m_MaxStringLengt) + "\t");
+                }
+                System.Diagnostics.Debug.WriteLine("");
+            }
+        }
+        private string GetNameStrictLengt(string name)
+        {
+            int tmp_maxlengt = m_MaxStringLengt;
+            int tmp_curlengt = -1;
+            tmp_curlengt = name.Length;
+            if (tmp_curlengt > tmp_maxlengt)
+                tmp_curlengt = tmp_maxlengt;             
+            return name.Substring(0, tmp_curlengt);
+        }
+
+
         internal virtual  Matrix GetResult()
         {
             return null;
         }
-
-        public Matrix UnweightedMatrix { get => m_UnweightedMatrix; }
         public Matrix WeightedMatrix { get => m_WeightedMatrix;  }
         public Matrix ResultMatrix { get => m_ResultMatrix; }
 
@@ -365,7 +383,6 @@ namespace MultiCriteriaDecision.Solver
         internal void FillFlatList()
         {
             m_AllComparisonItems = new Dictionary<IDecisionItem, List<CompareItem>>();
-            m_DecisionItemDictionary = new Dictionary<string, IDecisionItem>();
             ReadChildItems(m_Decision, (IReadOnlyList<IDecisionItem>)m_Decision.Clusters);
         }
         private  int ReadChildItems(IDecision decision, IReadOnlyList<IDecisionItem> itemList)
@@ -375,7 +392,6 @@ namespace MultiCriteriaDecision.Solver
             {
                 foreach (IDecisionItem childitem in itemList)
                 {
-                    m_DecisionItemDictionary.Add(childitem.ID.ToString(), childitem);
                     this.m_AllComparisonItems.Add(childitem,new List<CompareItem>());
                     tmp_itemCount += ReadChildItems(decision, childitem.Childs);
                 }
@@ -389,6 +405,5 @@ namespace MultiCriteriaDecision.Solver
         internal Matrix RawMatrix;
         internal Matrix WeightMatrix;
         internal Double ConsistencyRatio;
-        internal IComparisonPerspective LastProcessedPerspective;
     }
 }
