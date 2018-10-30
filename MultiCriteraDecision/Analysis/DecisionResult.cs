@@ -9,12 +9,22 @@ namespace MultiCriteriaDecision.Analysis
 {
     public class DecisionResult : ItemBase, IDecisionResult
     {
-        IList<IDecisionResultItem> m_Clusters = null;
+        Dictionary<IDecisionItem, float> m_Alternatives = null;
+        Dictionary<IComparisonPerspective, float> m_Consistencies = null;
         public DecisionResult(string name) : base(name)
         {
-            m_Clusters = new List<IDecisionResultItem>();
+            m_Alternatives = new Dictionary<IDecisionItem, float>();
+            m_Consistencies = new Dictionary<IComparisonPerspective, float>();
         }
-        public IList<IDecisionResultItem> Clusters { get => m_Clusters; }
-
+        internal void AddAlternative(IDecisionItem item, float Value)
+        {
+            m_Alternatives.Add(item, Value);
+        }
+        public IReadOnlyDictionary<IDecisionItem, float> Alternatives { get => m_Alternatives; }
+        internal void AddConsistency(IComparisonPerspective item, float Value)
+        {
+            m_Consistencies.Add(item, Value);
+        }
+        public IReadOnlyDictionary<IComparisonPerspective, float> Consistencies { get => m_Consistencies; }
     }
 }

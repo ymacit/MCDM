@@ -14,5 +14,6 @@ namespace MultiCriteriaDecision.Analysis
         {
         }
         public List<Judgment> Judgments { get; set; }
+        public string Expertise { get; set; }
     }
 }

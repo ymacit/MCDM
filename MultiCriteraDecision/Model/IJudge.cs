@@ -4,9 +4,8 @@ using System.Text;
 
 namespace MultiCriteriaDecision.Model
 {
-    public interface IJudge
+    public interface IJudge :IBase
     {
-        string Name { get; set; }
-        Guid ID { get; }
+        string Expertise { get; set; }
     }
 }

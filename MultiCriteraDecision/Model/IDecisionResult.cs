@@ -6,6 +6,7 @@ namespace MultiCriteriaDecision.Model
 {
     public interface IDecisionResult : IBase
     {
-        IList<IDecisionResultItem> Clusters { get; }
+        IReadOnlyDictionary<IDecisionItem, float> Alternatives { get; }        
+        IReadOnlyDictionary<IComparisonPerspective, float> Consistencies { get; }
     }
 }

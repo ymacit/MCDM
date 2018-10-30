@@ -12,6 +12,7 @@ namespace MultiCriteriaDecision.Solver
     public class AhpSolver
     {
         protected IDecision m_Decision = null;
+        protected DecisionResult m_DecisionResult = null;
         protected Matrix m_WeightedMatrix = null;
         protected Matrix m_ResultMatrix = null;
         Dictionary<IDecisionItem, List<CompareItem>> m_AllComparisonItems = null;
@@ -23,9 +24,10 @@ namespace MultiCriteriaDecision.Solver
         public AhpSolver(IDecision decision)
         {
             m_Decision = decision;
+            m_DecisionResult = new DecisionResult("Result of " + m_Decision.Name);
         }
 
-        public Matrix Solve()
+        public IDecisionResult Solve()
         {
             FillFlatList();
             FlatComparisons();
@@ -35,10 +37,26 @@ namespace MultiCriteriaDecision.Solver
             GenerateWeightedMatrix();
             PrintTree(m_Decision.RootPerspective, "", 1, true);
             PrintMatrixWithName(m_WeightedMatrix, "Weighted with Name");
-            PrintMatrixWithName(m_ResultMatrix, "Result with Name");
-            return m_ResultMatrix;
+            PrepareResult();
+            return m_DecisionResult;
         }
 
+        private void PrepareResult()
+        {
+            System.Diagnostics.Debug.WriteLine("*******  Result with Name *********");
+            System.Diagnostics.Debug.Write("".ToString().PadLeft(m_MaxStringLengt) + "\t");
+            for (int j = 0; j < m_ResultMatrix.ColumnCount; j++)
+            {
+                System.Diagnostics.Debug.WriteLine("Alternatives");
+            }
+            for (int i = 0; i < m_ResultMatrix.RowCount; i++)
+            {
+                m_DecisionResult.AddAlternative(m_MatrixRows[i], (float)m_ResultMatrix[i, 0]);
+                System.Diagnostics.Debug.Write(GetNameStrictLengt(m_MatrixRows[i].Name).PadLeft(m_MaxStringLengt) + "\t");
+                System.Diagnostics.Debug.WriteLine(m_ResultMatrix[i, 0].ToString("F5").PadLeft(m_MaxStringLengt) + "\t");
+            }
+
+        }
         internal void GenerateWeightedMatrix()
         {
             //PropagatePerpectiveWeigt_2(m_Decision.RootPerspective);
@@ -215,7 +233,8 @@ namespace MultiCriteriaDecision.Solver
             PrintMatrix(tmp_RawMatrix, connectorItem.Pivot.Name + " Raw" );
             tmp_RowWorkerMatrix = GetWeightMatrix(tmp_RawMatrix);
             PrintMatrix(tmp_RowWorkerMatrix, connectorItem.Pivot.Name + " Weight");
-            double tmp_ConsistencyRatio = Consistency.Check(tmp_RawMatrix, tmp_RowWorkerMatrix);
+            float tmp_ConsistencyRatio = Consistency.Check(tmp_RawMatrix, tmp_RowWorkerMatrix);
+            m_DecisionResult.AddConsistency(connectorItem, (float)tmp_ConsistencyRatio);
             PairwiseMatrixSet tmp_PairwiseMatrix = new PairwiseMatrixSet() { ConsistencyRatio = tmp_ConsistencyRatio, RawMatrix = tmp_RawMatrix, WeightMatrix = tmp_RowWorkerMatrix, VectorList= tmp_VectorList };
             return tmp_PairwiseMatrix;
         }
@@ -385,7 +404,7 @@ namespace MultiCriteriaDecision.Solver
             m_AllComparisonItems = new Dictionary<IDecisionItem, List<CompareItem>>();
             ReadChildItems(m_Decision, (IReadOnlyList<IDecisionItem>)m_Decision.Clusters);
         }
-        private  int ReadChildItems(IDecision decision, IReadOnlyList<IDecisionItemBase> itemList)
+        private  int ReadChildItems(IDecision decision, IReadOnlyList<IDecisionItem> itemList)
         {
             int tmp_itemCount = 0;
             if (itemList.Count > 0)

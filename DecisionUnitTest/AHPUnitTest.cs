@@ -172,9 +172,9 @@ namespace DecisionUnitTest
             System.Diagnostics.Debug.WriteLine(tmp_project.ToString());
 
             AhpSolver tmp_solver = new AhpSolver(tmp_project);
-            Matrix resultMatrix =tmp_solver.Solve();
+            IDecisionResult decisionResult = tmp_solver.Solve();
 
-            Assert.IsNotNull(resultMatrix, "success");
+            Assert.IsNotNull(decisionResult, "success");
 
         }
 
@@ -276,9 +276,9 @@ namespace DecisionUnitTest
             System.Diagnostics.Debug.WriteLine(tmp_project.ToString());
 
             AhpSolver tmp_solver = new AhpSolver(tmp_project);
-            Matrix resultMatrix = tmp_solver.Solve();
+            IDecisionResult decisionResult = tmp_solver.Solve();
 
-            Assert.IsNotNull(resultMatrix, "success");
+            Assert.IsNotNull(decisionResult, "success");
         }
 
         [TestMethod]
@@ -602,9 +602,9 @@ namespace DecisionUnitTest
             System.Diagnostics.Debug.WriteLine(tmp_project.ToString());
 
             AhpSolver tmp_solver = new AhpSolver(tmp_project);
-            Matrix resultMatrix = tmp_solver.Solve();
+            IDecisionResult decisionResult = tmp_solver.Solve();
 
-            Assert.IsNotNull(resultMatrix, "success");
+            Assert.IsNotNull(decisionResult, "success");
         }
     }
 }
