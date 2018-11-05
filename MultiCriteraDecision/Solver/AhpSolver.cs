@@ -15,6 +15,10 @@ namespace MultiCriteriaDecision.Solver
         {
         }
 
+        public override void SensitivityAnalysis()
+        {
+            ;
+        }
         protected override void GenerateResult()
         {
             double tmp_rowsum = 0;

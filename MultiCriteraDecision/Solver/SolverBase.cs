@@ -46,6 +46,8 @@ namespace MultiCriteriaDecision.Solver
 
         protected abstract void GenerateResult();
 
+        public abstract void SensitivityAnalysis();
+
         protected void GeneratePairwiseMatrix()
         {
             m_Perspectives = new Dictionary<IComparisonPerspective, PairwiseMatrixSet>();
@@ -110,41 +112,76 @@ namespace MultiCriteriaDecision.Solver
 
         protected void PrepareFlatComparisons()
         {
-            Dictionary<IDecisionItem, List<CompareItem>> tmp_AllComparisonItems =  new Dictionary<IDecisionItem, List<CompareItem>>();
+            List<IDecisionItem> tmp_AllComparisonItems = new List<IDecisionItem>();
+            //collect all decision item 
             ReadChildItems((IReadOnlyList<IDecisionItem>)m_Decision.Clusters, tmp_AllComparisonItems);
             
             m_FlatPairWiseComparison = new List<CompareItem>();
             List<CompareItem> tmp_sublist = null;
-            foreach (KeyValuePair<IDecisionItem, List<CompareItem>> pair in tmp_AllComparisonItems)
+            //group comparisons according to pivot decision item
+            foreach (IDecisionItem item in tmp_AllComparisonItems)
             {
                 //tmp_sublist = m_Decision.Judgments
                 //    .SelectMany(judgment => judgment.Comparisons
                 //    .SelectMany(comparison => comparison.Pairwises
                 //   .Where(pairwise => pairwise.Relation.Source.ID == pair.Key.ID)
-                //   .Select(pwi => new CompareItem() { ComparePivot = comparison.Perspective.Pivot, CompareSource = pwi.Relation.Source, CompareTarget = pwi.Relation.Target, CompareJudge = judgment.Judge, Ratio = pwi.Ratio }))).ToList();
+                //   .Select(pwi => new CompareItem() { ComparePivot = comparison.Perspective.Pivot, CompareSource = pwi.Relation.Source, CompareTarget = pwi.Relation.Target, Ratio = pwi.Ratio }))).ToList();
 
+                //select comparisons according to pivot decision item
                 tmp_sublist = (from j in m_Decision.Judgments
                                from c in j.Comparisons
                                from p in c.Pairwises
-                               where p.Relation.Source.ID == pair.Key.ID
-                               select new CompareItem() { ComparePivot = c.Perspective.Pivot, CompareSource = p.Relation.Source, CompareTarget = p.Relation.Target, CompareJudge = j.Judge, Ratio = p.Ratio }).ToList();
+                               where c.Perspective.Pivot.ID == item.ID
+                               select new CompareItem() {CompareGuid=Common.Combine(c.Perspective.Pivot.ID, p.Relation.Source.ID, p.Relation.Target.ID).ToString(),   ComparePivot = c.Perspective.Pivot, CompareSource = p.Relation.Source, CompareTarget = p.Relation.Target, Ratio = p.Ratio, CompareJudge=j.Judge }).ToList();
 
-                //check comparisionlist
-                foreach (CompareItem compareItem in tmp_sublist)
-                {
-                    m_FlatPairWiseComparison.Add(compareItem);
-                }
+                // bucket comparisons according to pivot decision item
+                m_FlatPairWiseComparison.AddRange(tmp_sublist); 
             }
+            //summarize group decisions if there are more than one judgment
+            if (m_Decision.Judgments.Count > 1)
+                m_FlatPairWiseComparison = SummarizeGroup(m_FlatPairWiseComparison);
         }
-        private void ReadChildItems(IReadOnlyList<IDecisionItem> sourceList, Dictionary<IDecisionItem, List<CompareItem>> target)
+        private void ReadChildItems(IReadOnlyList<IDecisionItem> sourceList, List<IDecisionItem> target)
         {
             foreach (IDecisionItem childitem in sourceList)
             {
-                target.Add(childitem, new List<CompareItem>());
+                target.Add(childitem);
                 ReadChildItems(childitem.Childs, target);
             }
         }
+        private List<CompareItem> SummarizeGroup(List<CompareItem> inputList)
+        {
+            /*
+             * For group decision making 
+             * Thomas L. Saaty, Luis G. Vargas-Models, Methods, Concepts & Applications of the Analytic Hierarchy Process-Springer (2013)
+             * Thomas L. Saaty, Luis G. Vargas-Decision Making With The Analytic Network Process-Springer (2013),
+             * Chapter 1.10, page 23
+             * Example 1.10.4.3. page 35
+             * JugmentMean=Power (J1*J2*J3*J4*J5*..*Jn, 1/n)
+             * Judgments = (5,5,2,4,4) , Mean =3.8073
+            */
+            List<CompareItem> tmp_result = new List<CompareItem>();
+            float tmp_score = 1f;
+            float tmp_powerDegree = 1f;
+            CompareItem tmp_First;
+            IEnumerable<IGrouping<string, CompareItem>> tmp_items = inputList.GroupBy(compare => compare.CompareGuid, compare => compare);
+            foreach (IGrouping<string, CompareItem> groupPair in tmp_items)
+            {
+                System.Diagnostics.Debug.WriteLine(groupPair.Key);
+                tmp_First = groupPair.First();
+                if (groupPair.Count() > 1)
+                {
+                    tmp_score = groupPair.Aggregate(1f, (result, next) => result * next.Ratio);
+                    tmp_powerDegree = 1f / groupPair.Count();
+                    tmp_score = (float)Math.Pow(tmp_score, tmp_powerDegree);
+                    tmp_First.Ratio = tmp_score;
+                    tmp_First.CompareJudge = null;
+                }
+                tmp_result.Add(tmp_First);
+            }
 
+            return tmp_result;
+        }
         internal void PropagatePerpectiveWeigt(IComparisonPerspective perspective, PairwiseMatrixSet parentSet)
         {
             PairwiseMatrixSet tmp_CurrentMatrixSet = null;

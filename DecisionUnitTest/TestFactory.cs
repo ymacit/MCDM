@@ -154,6 +154,34 @@ namespace DecisionUnitTest
             tmp_comparison_c6.Pairwises.Add(new PairwiseComparison(tmp_comparison_c6, tmp_Relation_C_A23) { Ratio = 1f / 3 });
             tmp_Judgment1.Comparisons.Add(tmp_comparison_c6);
 
+            #region Group Decision
+            //Second Judgment definition
+            IJudge tmp_judge2 = new Judge("Name2");
+            IJudgment tmp_Judgment2 = new Judgment(tmp_judge2, tmp_project) { ComparisonDate = System.DateTime.Now };
+            tmp_project.Judgments.Add(tmp_Judgment2);
+
+            //criteria judgment2
+            IComparison tmp_comparison_cj2 = new Comparison(tmp_connectorItem_c0, tmp_Judgment2);
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr12) { Ratio = 5f });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr13) { Ratio = 2f });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr14) { Ratio = 1f });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr15) { Ratio = 4f });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr16) { Ratio = 3f });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr23) { Ratio = 8f });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr24) { Ratio = 5f });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr25) { Ratio = 1f / 3 });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr26) { Ratio = 1f });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr34) { Ratio = 1f / 7 });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr35) { Ratio = 1f / 3 });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr36) { Ratio = 1f / 5 });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr45) { Ratio = 1f });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr46) { Ratio = 1f / 5 });
+            tmp_comparison_cj2.Pairwises.Add(new PairwiseComparison(tmp_comparison_cj2, tmp_Relation_Cr56) { Ratio = 5f });
+            tmp_Judgment2.Comparisons.Add(tmp_comparison_cj2);
+
+            #endregion
+
+
             return tmp_project;
         }
 

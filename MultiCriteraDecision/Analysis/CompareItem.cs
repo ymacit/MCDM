@@ -17,10 +17,11 @@ namespace MultiCriteriaDecision.Analysis
          * JugmentMean=Power (J1*J2*J3*J4*J5*..*Jn, 1/n)
          * Judgments = (5,5,2,4,4) , Mean =3.8073
          */
+        internal string CompareGuid { get; set; }
         internal IJudge CompareJudge { get; set; }
         internal IDecisionItem ComparePivot { get; set; }
         internal IDecisionItem CompareSource { get; set; }
         internal IDecisionItem CompareTarget { get; set; }
-        internal float Ratio { get; set; }
+        internal float Ratio { get; set; }        
     }
 }

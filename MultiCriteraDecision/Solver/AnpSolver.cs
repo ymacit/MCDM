@@ -19,6 +19,10 @@ namespace MultiCriteriaDecision.Solver
 
         internal Matrix LimitedMatrix { get => m_LimitedMatrix; set => m_LimitedMatrix = value; }
 
+        public override void SensitivityAnalysis()
+        {
+            ;
+        }
 
         private void PrepareDimensions(IComparisonPerspective perspective)
         {
